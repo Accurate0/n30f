@@ -1,0 +1,4 @@
+[submodule "cairo_jpg"]
+	path = cairo_jpg
+	url = https://github.com/rahra/cairo_jpg.git
+	branch = 08c86a68becb8b234db0551c0b33662299aeefe6

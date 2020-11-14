@@ -19,6 +19,8 @@
 
 #include <xcb/xcb.h>
 
+#include "cairo_jpg/src/cairo_jpg.h"
+
 // simple structure to represent some information about our xcb display
 // makes it easier to pass certain things around
 struct xcb_display_info
@@ -179,6 +181,15 @@ void draw (cairo_t *cr, cairo_surface_t *image)
 	cairo_fill (cr);
 }
 
+char* get_file_ext(const char *file)
+{
+	char *dot = strrchr(file, '.');
+	if(!dot || dot == file)
+		return NULL;
+
+    return dot + 1;
+}
+
 int main (int argc, char **argv)
 {
 	int x = 0;
@@ -292,9 +303,21 @@ int main (int argc, char **argv)
 	}
 
 	filename = argv[optind];
-
+	char *ext = get_file_ext(filename);
 	// load the image or quit
-	cairo_surface_t *image = cairo_image_surface_create_from_png(filename);
+	cairo_surface_t *image;
+
+	if(ext) {
+		if(!strcmp(ext, "jpg") || !strcmp(ext, "jpeg"))
+			image = cairo_image_surface_create_from_jpeg(filename);
+		else if(!strcmp(ext, "png"))
+			image = cairo_image_surface_create_from_png(filename);
+		else
+			errx(1, "error reading file: %s", filename);
+	} else {
+		errx(1, "file has no ext: %s", filename);
+	}
+
 	if(cairo_surface_status(image) != CAIRO_STATUS_SUCCESS)
 		errx(1, "error reading file: %s", filename);
 
